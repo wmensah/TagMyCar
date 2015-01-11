@@ -37,7 +37,8 @@ class UserFactory {
             $condition = array("mobile_device_id" => $mobile_device_id);
         }
         if ($condition != null) {
-            //Getting an individual user
+            //Getting an individual user (non-termed)
+            $condition += array("term_date_utc"=> NULL);
             $query = $this->_ci->db->get_where("user", $condition);
             //Check if any results were returned
             if ($query->num_rows() > 0) {
