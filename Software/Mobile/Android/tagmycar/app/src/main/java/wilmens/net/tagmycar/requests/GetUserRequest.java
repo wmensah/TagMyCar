@@ -45,7 +45,8 @@ public class GetUserRequest extends Request {
             if (retval.result == ServerResponseEnum.OK){
                 response.success = true;
                 try {
-                    response.user = User.loadFromJson(json.getJSONObject("data"));
+                    response.user = new User();
+                    response.user.loadFromJson(json.getJSONObject("data"));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
