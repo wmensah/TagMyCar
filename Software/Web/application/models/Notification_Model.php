@@ -91,11 +91,9 @@ class Notification_Model extends CI_Model implements \JsonSerializable {
         $this->acknowledgedDateUtc = $value;
     }
     
+    // $ack = true or false
     public function acknowledge($ack){
-        if ($ack < 0){
-            return false; // invalid ack value
-        }
-        if ($this->hasBeenAcknowledged()){
+        if ($this->isAcknowledged()){
             return false; //already acknowledged
         }
         
@@ -106,15 +104,15 @@ class Notification_Model extends CI_Model implements \JsonSerializable {
         );
         
         if ($this->db->update('lu_notifications', $data, array('notification_id'=>$this->notificationId))){
-            $this->acknowledged = $ack;
+            $this->acknowledged = $ack ? 1 : -1;
             $this->acknowledged_date_utc = $ackdate;
             return true;
         }
         return false;
     }
     
-    public function hasBeenAcknowledged(){
-        return ($this->acknowledged > 0);
+    public function isAcknowledged(){
+        return ($this->acknowledged != 0);
     }
    
     public function jsonSerialize() {

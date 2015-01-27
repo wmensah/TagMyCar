@@ -105,10 +105,10 @@ class User_Model extends CI_Model implements \JsonSerializable {
     
     // Internally only. This should not be exposed via the API. 
     public function deleteUser(){
-        if ($this->db->delete('user', array('id'=>$this->id))){
-            return true;
-        }
-        return false;
+        // delete notifications
+        $this->db->delete('lu_notifications', array('sent_to_user_id'=>$this->id));
+        $this->db->delete('user', array('id'=>$this->id));
+        return true;
     }
 
     public function jsonSerialize() {

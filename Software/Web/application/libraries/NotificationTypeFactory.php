@@ -12,6 +12,7 @@
  * @author Will
  */
 class NotificationTypeFactory {
+    
     private $_ci;
 
     function __construct() {
