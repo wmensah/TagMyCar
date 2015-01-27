@@ -1,5 +1,7 @@
 <?php
 
+date_default_timezone_set('UTC');
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -25,7 +27,7 @@ class User_Model extends CI_Model implements \JsonSerializable {
         $this->load->database();
     }
     
-    public function id(){
+    public function getId(){
         return $this->id;
     }
     
@@ -74,6 +76,9 @@ class User_Model extends CI_Model implements \JsonSerializable {
     }
     
     public function isTerminated(){
+        if (empty($this->termDateUtc)){
+            return false;
+        }
         $time = strtotime($this->termDateUtc);
         $date = date( 'y-m-d', $time );
         return ($date < getdate());
@@ -93,6 +98,14 @@ class User_Model extends CI_Model implements \JsonSerializable {
         }
         if ($this->db->insert('user', $data)){
             $this->id = $this->db->insert_id();
+            return true;
+        }
+        return false;
+    }
+    
+    // Internally only. This should not be exposed via the API. 
+    public function deleteUser(){
+        if ($this->db->delete('user', array('id'=>$this->id))){
             return true;
         }
         return false;

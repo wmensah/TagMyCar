@@ -1,5 +1,7 @@
 <?php
 
+date_default_timezone_set('UTC');
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -22,7 +24,7 @@ class UserFactory {
         $this->_ci->load->model("user_model");
     }
 
-    public function getUser($id = 0, $tag = null, $state = null, $mobile_device_id = null) {
+    public function getUser($id = 0, $tag = null, $state = null, $mobile_device_id = null, $include_termed=false) {
         //Are we getting an individual user or are we getting them all
         $condition = null;
         if ($id > 0) {
@@ -37,8 +39,10 @@ class UserFactory {
             $condition = array("mobile_device_id" => $mobile_device_id);
         }
         if ($condition != null) {
-            //Getting an individual user (non-termed)
-            $condition += array("term_date_utc"=> NULL);
+            //Getting an individual user 
+            if (!$include_termed){
+                $condition += array("term_date_utc"=> NULL);
+            }
             $query = $this->_ci->db->get_where("user", $condition);
             //Check if any results were returned
             if ($query->num_rows() > 0) {
@@ -66,9 +70,12 @@ class UserFactory {
     }
 
     public function addUser($tag, $state, $mobile_device_id) {
-        // Check to see if the user already exists
+        // validate input
+        if (empty($tag) || empty($state) || empty($mobile_device_id)){
+            return false;
+        }
         $user = $this->getUser(0, $tag, $state);
-        if ($user == false) {
+        if (!is_object($user)) {
             // add user
             $user = new User_Model();
             $user->setJoinDateUtc(date("Y-m-d H:i:s"));
@@ -90,10 +97,16 @@ class UserFactory {
         }
     }
 
-    public function terminateUser($id) {
+    public function terminateUser($id, $delete = false) {
         $user = $this->getUser($id);
         if ($user) {
-            if (!$user->isTerminated()) {
+            if ($delete){
+                if ($user->deleteUser()){
+                    return true;
+                }
+                return false;
+            }
+            if ($user->isTerminated()) {
                 return true;
             }
             $user->setTermDateUtc(date("Y-m-d H:i:s"));
@@ -109,9 +122,9 @@ class UserFactory {
         $user = new User_Model();
         //Set the ID on the user model
         $user->setId($row->id);
-        //Set the username on the user model
+        //Set the tag on the user model
         $user->setTag($row->tag);
-        //Set the password on the user model
+        //Set the state on the user model
         $user->setState($row->state);
         //Se the mobile device id on the user model
         $user->setMobileDeviceId($row->mobile_device_id);

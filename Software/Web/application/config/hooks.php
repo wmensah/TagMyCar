@@ -11,6 +11,13 @@
 */
 
 
+$hook['display_override'] = array(
+	'class' => 'DisplayHook',
+	'function' => 'captureOutput',
+	'filename' => 'DisplayHook.php',
+	'filepath' => 'hooks'
+);
+
 
 /* End of file hooks.php */
 /* Location: ./application/config/hooks.php */

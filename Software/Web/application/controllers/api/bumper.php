@@ -42,6 +42,11 @@ class Bumper extends REST_Controller{
     // terminates a user
     public function user_delete($id){
         // deletes an existing user
+        // check user exists and is active
+        $user = $this->userfactory->getUser($id);
+        if (!$user || $user.isTerminated()){
+            $this->response("User ID " . $id . " not found", 400);
+        }
         $retval =$this->userfactory->terminateUser($id);
         if ($retval){
             $this->response(true, 200);
